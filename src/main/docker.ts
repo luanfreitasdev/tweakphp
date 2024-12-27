@@ -2,11 +2,16 @@ import { execSync } from 'child_process'
 import path from 'path'
 import { fileURLToPath } from 'url'
 import { app, ipcMain } from 'electron'
+import { isLinux, isMacOS } from './platform.ts'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
-export const DOCKER_MACOS_PATH = '/usr/local/bin/docker'
+export const DOCKER_PATH = (() => {
+  if (isLinux()) return 'sudo /usr/bin/docker';
+  if (isMacOS()) return '/usr/local/bin/docker';
+  return '';
+})();
 
 export const init = async () => {
   ipcMain.on('docker-ps', event => {
@@ -58,7 +63,7 @@ export const init = async () => {
 
 export const getDockerContainers = () => {
   try {
-    const result = execSync(`${DOCKER_MACOS_PATH} ps --format "{{.ID}}|{{.Names}}|{{.Image}}"`).toString().trim()
+    const result = execSync(`${DOCKER_PATH} ps --format "{{.ID}}|{{.Names}}|{{.Image}}"`).toString().trim()
 
     if (result) {
       return result.split('\n').map(line => {
@@ -78,7 +83,7 @@ export const getDockerContainers = () => {
 
 export const getPhpPath = (containerId: string) => {
   try {
-    return execSync(`${DOCKER_MACOS_PATH} exec ${containerId} which php`).toString().trim()
+    return execSync(`${DOCKER_PATH} exec ${containerId} which php`).toString().trim()
   } catch (error) {
     console.error(`Error retrieving which php ${containerId}: ${error}`)
     return null
@@ -92,7 +97,7 @@ export const installPharClient = (phpVersion: string | null, containerId: string
 
   try {
     const pharPath = `/tmp/client-${phpVersion}.phar`
-    const result = execSync(`${DOCKER_MACOS_PATH} cp ${getClient} ${containerId}:'${pharPath}'`).toString().trim()
+    const result = execSync(`${DOCKER_PATH} cp ${getClient} ${containerId}:'${pharPath}'`).toString().trim()
 
     console.log(`Phar was copied in Container ${containerId} to /tmp/client-${phpVersion}.phar:`, result)
 
@@ -105,7 +110,7 @@ export const installPharClient = (phpVersion: string | null, containerId: string
 
 export const checkPHPVersion = (containerId: string) => {
   try {
-    const result = execSync(`${DOCKER_MACOS_PATH} exec ${containerId} php --version`).toString().trim()
+    const result = execSync(`${DOCKER_PATH} exec ${containerId} php --version`).toString().trim()
 
     const versionMatch = result.match(/PHP\s(\d+\.\d+\.\d+)/)
     const phpVersion = versionMatch ? versionMatch[1] : null

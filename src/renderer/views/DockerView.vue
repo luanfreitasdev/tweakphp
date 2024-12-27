@@ -159,7 +159,7 @@
           <div>Container</div>
 
           <div class="flex gap-3 items-center">
-            <div>
+            <div class="w-full">
               <SelectInput
                 v-if="containers.length > 0"
                 placeholder="Select container"
