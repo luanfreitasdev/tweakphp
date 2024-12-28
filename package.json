@@ -6,7 +6,7 @@
     "name": "Saeed Vaziry",
     "email": "mr.saeedvaziry@gmail.com"
   },
-  "version": "0.2.0",
+  "version": "0.3.0",
   "type": "module",
   "main": "dist/main.js",
   "scripts": {
@@ -14,7 +14,9 @@
     "update-clients": "node ./scripts/update-clients.js",
     "build": "vue-tsc && vite build",
     "build-mac": "npm run build && electron-builder --mac --universal",
+    "build-linux": "npm run build && electron-builder --linux",
     "publish-mac": "npm run build && electron-builder --publish always --mac --universal",
+    "publish-linux": "npm run build && electron-builder --publish always --linux",
     "preview": "vite preview",
     "lint": "prettier --check ./",
     "lint:fix": "prettier --write ./"
@@ -40,6 +42,36 @@
     },
     "directories": {
       "output": "release"
+    },
+    "linux": {
+      "executableName": "tweakphp",
+      "description": "Tweak your PHP code easily",
+      "icon": "./build/icon.icns",
+      "target": [
+        {
+          "target": "AppImage",
+          "arch": [
+            "x64",
+            "armv7l",
+            "arm64"
+          ]
+        }
+      ],
+      "desktop": {
+        "Name": "TweakPHP",
+        "icon": "./build/icon.icns",
+        "Comment": "Tweak your PHP code easily",
+        "Categories": "Development"
+      },
+      "maintainer": "Saeed Vaziry",
+      "category": "Development"
+    },
+    "deb": {
+      "packageCategory": "Development",
+      "depends": [
+        "zlib1g",
+        "zlib1g-dev"
+      ]
     },
     "mac": {
       "darkModeSupport": true

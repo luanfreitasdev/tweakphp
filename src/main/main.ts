@@ -40,6 +40,8 @@ app.whenReady().then(async () => {
     center: true,
     icon: path.join(app.getAppPath(), 'build/icon.png'),
   })
+  window.setMenuBarVisibility(false)
+
   if (process.env.VITE_DEV_SERVER_URL) {
     await window.loadURL(process.env.VITE_DEV_SERVER_URL)
     window.webContents.openDevTools()

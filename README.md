@@ -22,7 +22,18 @@
 
 <hr>
 
-**TweakPHP is currently Beta**
+⚠️ **TweakPHP is currently Beta**
+
+<hr>
+
+   * [Demo Video](#demo-video)
+   * [Screenshots](#screenshots)
+   * [Installation](#installation)
+      * [MacOS](#macos)
+      * [Linux](#linux)
+      * [Windows](#windows)
+   * [Contribution Guide](#contribution-guide)
+   * [License](#license)
 
 ## Demo Video
 
@@ -36,22 +47,34 @@ https://youtu.be/3KnzaQJK7NU?si=lHIb3GmZYyXiQ2cB
 
 ![CleanShot 2024-12-24 at 23 48 16@2x](https://github.com/user-attachments/assets/cb119abe-b576-4da2-a6c6-9445578828af)
 
-## Setup Locally
+## Installation
 
-Install dependencies
+Download and install the latest version from the [Releases](https://github.com/tweakphp/tweakphp/releases) page.
 
-```
-npm install
+### MacOS
+
+Installing the latest release will work out of the box.
+
+### Linux
+
+**AppImage**: The AppImage release requires the `libz.so` library to be installed on your system. You can install it by running the following command:
+
+Ubuntu/Debian:
+
+```bash
+sudo apt-get install zlib1g zlib1g-dev -y
 ```
 
-Copy .env.dist as .env
+**Snap**: Coming Soon!
 
-```
-cp .env.dist .env
-```
+### Windows
 
-Run the app
+Coming Soon!
 
-```
-npm run dev
-```
+## Contribution Guide
+
+Please read the [Contribution Guide](CONTRIBUTING.md) to get started.
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE.md) file for details.

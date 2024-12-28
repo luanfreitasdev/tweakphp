@@ -1,4 +1,4 @@
-name: Release
+name: Build
 
 on:
   workflow_dispatch:
@@ -7,11 +7,11 @@ permissions:
   contents: write
 
 jobs:
-  build-mac:
-    runs-on: macos-latest
+  build:
+    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        node-version: ['22.x']
+        os: [macos-latest, ubuntu-latest]
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
@@ -24,8 +24,16 @@ jobs:
       - name: Install NPM Dependencies
         run: npm install
 
-      - name:  Build & Publish
+      - name: Build & Publish Mac
+        if: matrix.os == 'macos-latest'
         run: npm run publish-mac
+        env:
+          VITE_LSP_WEBSOCKET_PORT: 54331
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build & Publish Linux
+        if: matrix.os == 'ubuntu-latest'
+        run: npm run publish-linux
         env:
           VITE_LSP_WEBSOCKET_PORT: 54331
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
