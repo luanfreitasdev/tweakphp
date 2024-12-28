@@ -8,7 +8,7 @@ const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
 export const DOCKER_PATH = (() => {
-  if (isLinux()) return 'sudo /usr/bin/docker'
+  if (isLinux()) return '/usr/bin/docker'
   if (isMacOS()) return '/usr/local/bin/docker'
   return ''
 })()
