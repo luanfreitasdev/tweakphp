@@ -10,37 +10,37 @@ const __dirname = path.dirname(__filename)
 export const DOCKER_MACOS_PATH = '/usr/local/bin/docker'
 
 export const init = async () => {
-  ipcMain.on('docker-ps', async event => {
+  ipcMain.on('docker.containers.info', async event => {
     try {
       const containers = getDockerContainers()
-      event.reply('docker-ps-response', containers)
+      event.reply('docker.containers.reply', containers)
     } catch (error: unknown) {
-      event.reply('docker-ps-error', { error })
+      event.reply('docker.containers.reply.error', { error })
     }
   })
 
-  ipcMain.on('docker-check-php-version', (event, args) => {
+  ipcMain.on('docker.php-version.info', (event, args) => {
     try {
       const result = checkPHPVersion(args.container_id)
-      event.reply('docker-check-php-version-response', result)
+      event.reply('docker.php-version.reply', result)
     } catch (error: unknown) {
-      event.reply('docker-check-php-version-error', { error })
+      event.reply('docker.php-version.reply.error', { error })
     }
   })
 
-  ipcMain.on('docker-install-phar-client', (event, args) => {
+  ipcMain.on('docker.copy-phar.execute', (event, args) => {
     try {
       const versionMatch = args.php_version.match(/^(\d+\.\d+)/)
       const phpVersion = versionMatch ? versionMatch[1] : null
 
       const result = installPharClient(phpVersion, args.container_id)
 
-      event.reply('docker-install-phar-client-response', {
+      event.reply('docker.copy-phar.reply', {
         container_id: args.container_id,
         phar_path: result,
       })
     } catch (error: unknown) {
-      event.reply('docker-install-phar-client-error', { error })
+      event.reply('docker.copy-phar.reply.error', { error })
     }
   })
 }

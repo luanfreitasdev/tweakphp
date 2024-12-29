@@ -83,7 +83,7 @@
     tabsStore.updateTab(tab.value)
   }
 
-  window.ipcRenderer.on('docker-install-phar-client-response', (e: PharPathResponse) => {
+  window.ipcRenderer.on('docker.copy-phar.reply', (e: PharPathResponse) => {
     e.container_id && dockerClients.value.push(e.container_id)
   })
 
@@ -95,7 +95,7 @@
 
     if (docker.enable) {
       if (!dockerClients.value.includes(container_id)) {
-        window.ipcRenderer.send('docker-install-phar-client', {
+        window.ipcRenderer.send('docker.copy-phar.execute', {
           php_version: php_version,
           container_id: container_id,
         })

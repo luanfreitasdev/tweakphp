@@ -40,7 +40,7 @@
       form.value.container_name = selected.name
     }
 
-    window.ipcRenderer.send('docker-install-phar-client', {
+    window.ipcRenderer.send('docker.copy-phar.execute', {
       php_version: phpVersion.value,
       container_id: form.value.container_id,
     })
@@ -53,17 +53,17 @@
 
     created.value = false
 
-    window.ipcRenderer.send('docker-check-php-version', {
+    window.ipcRenderer.send('docker.php-version.info', {
       container_id: form.value.container_id,
     })
   }
 
   const listDockerContainer = () => {
     loading.value = true
-    window.ipcRenderer.send('docker-ps')
+    window.ipcRenderer.send('docker.containers.info')
   }
 
-  const handleDockerCheckPHPVersionResponse = (e: PHPInfoResponse) => {
+  const handleDockerPHPVersionReply = (e: PHPInfoResponse) => {
     errorResponse.value = ''
     loading.value = false
     phpVersion.value = e.php_version
@@ -75,7 +75,17 @@
     }
   }
 
-  const handleDockerInstallPharClientResponse = (e: PharPathResponse) => {
+  const handleDockerPHPVersionReplyError = () => {
+    phpVersion.value = 'Not Found'
+    errorResponse.value = ''
+    shouldConnect.value = false
+  }
+
+  const handleDockerCopyPharReplyError = () => {
+    alert(`PHP Client for version ${phpVersion.value} not found`)
+  }
+
+  const handleDockerCopyPharReply = (e: PharPathResponse) => {
     errorResponse.value = ''
     let currentTab: Tab = tabsStore.findTab(tabsStore.current?.id)
 
@@ -92,24 +102,14 @@
     router.push({ name: 'code', params: { id: currentTab.id } })
   }
 
-  const handleDockerInstallPharClientError = () => {
-    alert(`PHP Client for version ${phpVersion.value} not found`)
-  }
-
-  const handleDockerCheckPHPVersionError = () => {
-    phpVersion.value = 'Not Found'
+  const handleDockerContainersReply = (e: DockerContainerResponse[]) => {
     errorResponse.value = ''
-    shouldConnect.value = false
-  }
-
-  const handleDockerPsError = (e: { error: string }) => {
-    errorResponse.value = e.error
+    containers.value = e || []
     loading.value = false
   }
 
-  const handleDockerPsResponse = (e: DockerContainerResponse[]) => {
-    errorResponse.value = ''
-    containers.value = e || []
+  const handleDockerContainersReplyError = (e: { error: string }) => {
+    errorResponse.value = e.error
     loading.value = false
   }
 
@@ -127,25 +127,25 @@
 
     created.value = true
 
-    window.ipcRenderer.on('docker-ps-response', handleDockerPsResponse)
-    window.ipcRenderer.on('docker-ps-error', handleDockerPsError)
+    window.ipcRenderer.on('docker.containers.reply', handleDockerContainersReply)
+    window.ipcRenderer.on('docker.containers.reply.error', handleDockerContainersReplyError)
 
-    window.ipcRenderer.on('docker-check-php-version-error', handleDockerCheckPHPVersionError)
-    window.ipcRenderer.on('docker-check-php-version-response', handleDockerCheckPHPVersionResponse)
+    window.ipcRenderer.on('docker.php-version.reply', handleDockerPHPVersionReply)
+    window.ipcRenderer.on('docker.php-version.reply.error', handleDockerPHPVersionReplyError)
 
-    window.ipcRenderer.on('docker-install-phar-client-error', handleDockerInstallPharClientError)
-    window.ipcRenderer.on('docker-install-phar-client-response', handleDockerInstallPharClientResponse)
+    window.ipcRenderer.on('docker.copy-phar.reply', handleDockerCopyPharReply)
+    window.ipcRenderer.on('docker.copy-phar.reply.error', handleDockerCopyPharReplyError)
   })
 
   onUnmounted(() => {
-    window.ipcRenderer.removeListener('docker-ps-response', handleDockerPsResponse)
-    window.ipcRenderer.removeListener('docker-ps-error', handleDockerPsError)
+    window.ipcRenderer.removeListener('docker.containers.reply', handleDockerContainersReply)
+    window.ipcRenderer.removeListener('docker.containers.reply.error', handleDockerContainersReplyError)
 
-    window.ipcRenderer.removeListener('docker-check-php-version-error', handleDockerCheckPHPVersionError)
-    window.ipcRenderer.removeListener('docker-check-php-version-response', handleDockerCheckPHPVersionResponse)
+    window.ipcRenderer.removeListener('docker.php-version.reply', handleDockerPHPVersionReplyError)
+    window.ipcRenderer.removeListener('docker.php-version.reply.error', handleDockerPHPVersionReply)
 
-    window.ipcRenderer.removeListener('docker-install-phar-client-error', handleDockerInstallPharClientError)
-    window.ipcRenderer.removeListener('docker-install-phar-client-response', handleDockerInstallPharClientResponse)
+    window.ipcRenderer.removeListener('docker.copy-phar.reply', handleDockerCopyPharReply)
+    window.ipcRenderer.removeListener('docker.copy-phar.reply.error', handleDockerCopyPharReplyError)
   })
 
   watch(dockerEnabled, (value: boolean) => {

@@ -31,7 +31,7 @@
     tabsStore.updateTab(currentTab)
   }
 
-  const handleDockerCheckPHPVersionResponse = (e: string) => {
+  const handleDockerPHPVersionReply = (e: string) => {
     if (tabsStore.current?.docker.enable) {
       connected.value = e.toString() !== ''
 
@@ -41,7 +41,7 @@
     connected.value = false
   }
 
-  const handleDockerCheckPHPVersionError = () => {
+  const handleDockerPHPVersionReplyError = () => {
     connected.value = false
   }
 
@@ -50,17 +50,17 @@
       return
     }
 
-    window.ipcRenderer.send('docker-check-php-version', {
+    window.ipcRenderer.send('docker.php-version.info', {
       container_id: props.tab.docker.container_id,
     })
 
-    window.ipcRenderer.on('docker-check-php-version-response', handleDockerCheckPHPVersionResponse)
-    window.ipcRenderer.on('docker-check-php-version-error', handleDockerCheckPHPVersionError)
+    window.ipcRenderer.on('docker.php-version.reply', handleDockerPHPVersionReply)
+    window.ipcRenderer.on('docker.php-version.reply.error', handleDockerPHPVersionReplyError)
   })
 
   onUnmounted(() => {
-    window.ipcRenderer.removeListener('docker-check-php-version-response', handleDockerCheckPHPVersionResponse)
-    window.ipcRenderer.removeListener('docker-check-php-version-error', handleDockerCheckPHPVersionError)
+    window.ipcRenderer.removeListener('docker.php-version.reply', handleDockerPHPVersionReply)
+    window.ipcRenderer.removeListener('docker.php-version.reply.error', handleDockerPHPVersionReplyError)
   })
 </script>
 
