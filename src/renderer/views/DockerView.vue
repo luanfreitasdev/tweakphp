@@ -19,7 +19,7 @@
   const dockerEnabled = ref<boolean>(false)
   const loading = ref<boolean>(false)
   const containers = ref<{ id: string; name: string; image: string }[]>([])
-  const errorResponse = ref<string|null>(null)
+  const errorResponse = ref<string | null>(null)
   const phpVersion = ref<string | null>(null)
   const phpPath = ref<string | null>(null)
 
@@ -190,7 +190,7 @@
                 </option>
               </SelectInput>
               <div v-else>
-                  {{ errorResponse ? 'Error' : 'No containers found' }}
+                {{ errorResponse ? 'Error' : 'No containers found' }}
               </div>
             </div>
             <div class="w-10 flex justify-center">
