@@ -34,6 +34,7 @@ app.whenReady().then(async () => {
     titleBarStyle: 'hiddenInset',
     webPreferences: {
       preload: path.join(__dirname, 'preload.mjs'),
+      nodeIntegration: true,
       devTools: !app.isPackaged,
     },
     alwaysOnTop: false,

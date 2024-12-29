@@ -31,6 +31,8 @@
   const settingsStore = useSettingsStore()
   const updateStore = useUpdateStore()
 
+  const platform = window.platformInfo.getPlatform()
+
   const isAppReady = ref(false)
   const initAppInterval = setInterval(() => {
     if (isAppReady.value) {
@@ -98,7 +100,11 @@
   <div v-if="isAppReady" class="h-full" :style="{ color: settingsStore.colors.foreground }">
     <TitleBar />
     <aside
-      class="w-12 fixed z-40 top-[38px] left-0 bottom-0 justify-between border-r"
+      class="w-12 fixed z-40 left-0 bottom-0 justify-between border-r"
+      :class="{
+        'top-[38px]': platform === 'darwin',
+        'top-0': platform !== 'darwin',
+      }"
       :style="{
         backgroundColor: settingsStore.colors.background,
         borderColor: settingsStore.colors.border,

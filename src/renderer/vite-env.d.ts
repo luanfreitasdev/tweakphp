@@ -1,7 +1,8 @@
 /// <reference types="vite/client" />
 
-import { IpcRenderer } from '../preload/preload'
+import { IpcRenderer, PlatformInfo } from '../preload/preload'
 
 interface Window {
   ipcRenderer: IpcRenderer
+  platformInfo: PlatformInfo
 }

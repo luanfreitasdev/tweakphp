@@ -37,6 +37,7 @@ export const useTabsStore = defineStore('tabs', () => {
   }
   const tabs: Ref<Tab[]> = ref(defaultTabs)
   const current: Ref<Tab | null> = ref(null)
+  const scrollPosition = ref(0)
 
   const setCurrent = (tab: Tab) => {
     current.value = tab
@@ -118,6 +119,10 @@ export const useTabsStore = defineStore('tabs', () => {
     return tab
   }
 
+  const setScrollPosition = (position: number) => {
+    scrollPosition.value = position
+  }
+
   return {
     tabs,
     current,
@@ -126,5 +131,7 @@ export const useTabsStore = defineStore('tabs', () => {
     updateTab,
     findTab,
     setCurrent,
+    scrollPosition,
+    setScrollPosition,
   }
 })

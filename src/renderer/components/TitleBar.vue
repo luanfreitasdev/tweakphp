@@ -11,6 +11,7 @@
   const settingsStore = useSettingsStore()
   const executeStore = useExecuteStore()
   const route = useRoute()
+  const platform = window.platformInfo.getPlatform()
 
   const execute = () => {
     if (route.name !== 'code') {
@@ -29,15 +30,28 @@
 <template>
   <div
     id="title-bar"
-    class="fixed top-0 left-0 right-0 z-40 w-full h-[38px] border-b"
+    class="fixed top-0 right-0 h-[38px]"
+    :class="{
+      'z-40 left-0 w-full border-b': platform === 'darwin',
+      'z-50': platform !== 'darwin',
+    }"
     :style="{
       backgroundColor: settingsStore.colors.background,
       borderColor: settingsStore.colors.border,
     }"
   >
-    <div class="px-2 absolute left-0 right-0 h-full flex items-center justify-between w-full">
-      <div class="flex-grow-0 w-[120px]"></div>
-      <div class="flex-grow w-full drag flex items-center justify-center">TweakPHP</div>
+    <div
+      class="absolute right-0 flex items-center justify-between"
+      :class="{
+        'w-full left-0 h-full px-2': platform === 'darwin',
+        'h-[27px] pr-2': platform !== 'darwin',
+      }"
+      :style="{
+        backgroundColor: settingsStore.colors.background,
+      }"
+    >
+      <div class="flex-grow-0 w-[120px]" v-if="platform === 'darwin'"></div>
+      <div class="flex-grow w-full drag flex items-center justify-center" v-if="platform === 'darwin'">TweakPHP</div>
       <div class="flex-grow-0 flex items-center">
         <div v-tippy="'Change layout'">
           <template v-if="$router.currentRoute.value.name === 'code'">

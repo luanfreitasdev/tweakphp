@@ -1,8 +1,18 @@
 @import '../../../node_modules/tippy.js/dist/tippy.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 .monaco-editor {
   position: absolute !important;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }

@@ -57,15 +57,7 @@ Installing the latest release will work out of the box.
 
 ### Linux
 
-**AppImage**: The AppImage release requires the `libz.so` library to be installed on your system. You can install it by running the following command:
-
-Ubuntu/Debian:
-
-```bash
-sudo apt-get install zlib1g zlib1g-dev -y
-```
-
-**Snap**: Coming Soon!
+Coming Soon!
 
 ### Windows
 
