@@ -190,7 +190,7 @@
                 </option>
               </SelectInput>
               <div v-else>
-                  {{ 'No containers found' }}
+                No containers found
               </div>
             </div>
             <div class="w-10 flex justify-center">
