@@ -12,6 +12,7 @@
   import router from '../router/index'
   import { Tab } from '../types/tab.type'
   import DockerTabConnection from '../components/DockerTabConnection.vue'
+  import { PharPathResponse } from '../../main/types/docker.type.ts'
 
   const settingsStore = useSettingsStore()
   const executeStore = useExecuteStore()
@@ -79,7 +80,7 @@
     tabsStore.updateTab(tab.value)
   }
 
-  window.ipcRenderer.on('docker-install-phar-client-response', (e: { phar: string; container_id: string }) => {
+  window.ipcRenderer.on('docker-install-phar-client-response', (e: PharPathResponse) => {
     e.container_id && dockerClients.value.push(e.container_id)
   })
 
@@ -92,7 +93,7 @@
     if (docker.enable) {
       if (!dockerClients.value.includes(container_id)) {
         window.ipcRenderer.send('docker-install-phar-client', {
-          phpVersion: php_version,
+          php_version: php_version,
           container_id: container_id,
         })
       }

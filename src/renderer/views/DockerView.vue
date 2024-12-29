@@ -11,6 +11,7 @@
   import { Tab } from '../types/tab.type.ts'
   import router from '../router'
   import SwitchInput from '../components/SwitchInput.vue'
+  import { DockerContainerResponse, PharPathResponse, PHPInfoResponse } from '../../main/types/docker.type.ts'
 
   const tabsStore = useTabsStore()
 
@@ -18,7 +19,7 @@
   const dockerEnabled = ref<boolean>(false)
   const loading = ref<boolean>(false)
   const containers = ref<{ id: string; name: string; image: string }[]>([])
-
+  const errorResponse = ref<string|null>(null)
   const phpVersion = ref<string | null>(null)
   const phpPath = ref<string | null>(null)
 
@@ -40,7 +41,7 @@
     }
 
     window.ipcRenderer.send('docker-install-phar-client', {
-      phpVersion: phpVersion.value,
+      php_version: phpVersion.value,
       container_id: form.value.container_id,
     })
   }
@@ -62,10 +63,11 @@
     window.ipcRenderer.send('docker-ps')
   }
 
-  const handleDockerCheckPHPVersionResponse = (e: { phpVersion: string; phpPath: string }) => {
+  const handleDockerCheckPHPVersionResponse = (e: PHPInfoResponse) => {
+    errorResponse.value = ''
     loading.value = false
-    phpVersion.value = e.phpVersion
-    phpPath.value = e.phpPath
+    phpVersion.value = e.php_version
+    phpPath.value = e.php_path
     shouldConnect.value = true
 
     if (!created.value) {
@@ -73,10 +75,11 @@
     }
   }
 
-  const handleDockerInstallPharClientResponse = (e: { phar: string }) => {
+  const handleDockerInstallPharClientResponse = (e: PharPathResponse) => {
+    errorResponse.value = ''
     let currentTab: Tab = tabsStore.findTab(tabsStore.current?.id)
 
-    currentTab.remote_phar_client = e.phar
+    currentTab.remote_phar_client = e.phar_path
     currentTab.remote_path = form.value.working_directory
     currentTab.docker.enable = true
     currentTab.docker.php = phpPath.value ?? 'Not Found'
@@ -95,16 +98,23 @@
 
   const handleDockerCheckPHPVersionError = () => {
     phpVersion.value = 'Not Found'
+    errorResponse.value = ''
     shouldConnect.value = false
+  }
+
+  const handleDockerPsError = (e: { error: string }) => {
+    errorResponse.value = e.error
+    loading.value = false
+  }
+
+  const handleDockerPsResponse = (e: DockerContainerResponse[]) => {
+    errorResponse.value = ''
+    containers.value = e || []
+    loading.value = false
   }
 
   onMounted(() => {
     listDockerContainer()
-
-    window.ipcRenderer.on('docker-ps-response', e => {
-      containers.value = e || []
-      loading.value = false
-    })
 
     if (tabsStore.current && tabsStore.current.docker) {
       dockerEnabled.value = tabsStore.current.docker.enable
@@ -117,15 +127,23 @@
 
     created.value = true
 
+    window.ipcRenderer.on('docker-ps-response', handleDockerPsResponse)
+    window.ipcRenderer.on('docker-ps-error', handleDockerPsError)
+
     window.ipcRenderer.on('docker-check-php-version-error', handleDockerCheckPHPVersionError)
     window.ipcRenderer.on('docker-check-php-version-response', handleDockerCheckPHPVersionResponse)
+
     window.ipcRenderer.on('docker-install-phar-client-error', handleDockerInstallPharClientError)
     window.ipcRenderer.on('docker-install-phar-client-response', handleDockerInstallPharClientResponse)
   })
 
   onUnmounted(() => {
+    window.ipcRenderer.removeListener('docker-ps-response', handleDockerPsResponse)
+    window.ipcRenderer.removeListener('docker-ps-error', handleDockerPsError)
+
     window.ipcRenderer.removeListener('docker-check-php-version-error', handleDockerCheckPHPVersionError)
     window.ipcRenderer.removeListener('docker-check-php-version-response', handleDockerCheckPHPVersionResponse)
+
     window.ipcRenderer.removeListener('docker-install-phar-client-error', handleDockerInstallPharClientError)
     window.ipcRenderer.removeListener('docker-install-phar-client-response', handleDockerInstallPharClientResponse)
   })
@@ -156,10 +174,10 @@
 
       <div class="mt-3 max-w-2xl mx-auto space-y-3">
         <div class="grid grid-cols-2 items-center">
-          <div>Container</div>
+          <div>Containers</div>
 
           <div class="flex gap-3 items-center">
-            <div>
+            <div class="w-full">
               <SelectInput
                 v-if="containers.length > 0"
                 placeholder="Select container"
@@ -171,9 +189,11 @@
                   {{ container.name }}
                 </option>
               </SelectInput>
-              <div v-else>No containers found</div>
+              <div v-else>
+                  {{ errorResponse ? 'Error' : 'No containers found' }}
+              </div>
             </div>
-            <div class="w-10">
+            <div class="w-10 flex justify-center">
               <ArrowPathIcon
                 :spin="true"
                 @click="listDockerContainer"
@@ -183,6 +203,7 @@
             </div>
           </div>
         </div>
+
         <Divider />
 
         <div v-if="Object.values(containers).length > 0" class="space-y-3">
@@ -200,13 +221,17 @@
           <Divider />
           <div class="grid grid-cols-2 items-center">
             <div>Status</div>
-            {{ form.container_id ? 'Connected' : 'Disconnected' }}
+            {{ tabsStore.current?.remote_phar_client ? 'Connected' : 'Disconnected' }}
           </div>
 
           <Divider />
           <div class="flex items-center justify-end">
             <PrimaryButton :disabled="!shouldConnect" @click="connect">Connect</PrimaryButton>
           </div>
+        </div>
+
+        <div class="mt-2">
+          <span v-text="errorResponse" class="text-xs text-red-500"></span>
         </div>
       </div>
     </div>
