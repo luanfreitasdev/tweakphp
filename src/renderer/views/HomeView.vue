@@ -8,7 +8,6 @@
   import { useSettingsStore } from '../stores/settings'
   import { Tab } from '../types/tab.type'
   import { History } from '../types/history.type'
-  import { isWindows } from '../../main/platform.ts'
 
   const tabsStore = useTabsStore()
   const historyStore = useHistoryStore()
@@ -24,7 +23,7 @@
   })
 
   const updateTab = (history: History) => {
-    const pathSplitter = isWindows() ? '\\' : '/'
+    const pathSplitter = window.platformInfo.getPlatform() === 'win32' ? '\\' : '/'
 
     let tab: Tab = props.tab
     tab.type = 'code'

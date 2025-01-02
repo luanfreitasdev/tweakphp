@@ -1,7 +1,6 @@
 import { Ref, ref } from 'vue'
 import { defineStore } from 'pinia'
 import { Tab } from '../types/tab.type'
-import { isWindows } from '../../main/platform.ts'
 
 export const useTabsStore = defineStore('tabs', () => {
   // setup tabs
@@ -48,7 +47,7 @@ export const useTabsStore = defineStore('tabs', () => {
     if (!data.id) {
       data.id = Date.now()
     }
-    const pathSplitter = isWindows() ? '\\' : '/'
+    const pathSplitter = window.platformInfo.getPlatform() === 'win32' ? '\\' : '/'
 
     let tab: Tab = {
       id: data.id,
