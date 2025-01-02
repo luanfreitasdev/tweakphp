@@ -1,6 +1,7 @@
 import { Ref, ref } from 'vue'
 import { defineStore } from 'pinia'
 import { Tab } from '../types/tab.type'
+import { isWindows } from '../../main/platform.ts'
 
 export const useTabsStore = defineStore('tabs', () => {
   // setup tabs
@@ -47,10 +48,12 @@ export const useTabsStore = defineStore('tabs', () => {
     if (!data.id) {
       data.id = Date.now()
     }
+    const pathSplitter = isWindows() ? '\\' : '/'
+
     let tab: Tab = {
       id: data.id,
       type: data.type,
-      name: data.type === 'home' ? 'home' : data.path?.split('/').pop(),
+      name: data.type === 'home' ? 'home' : data.path?.split(pathSplitter).pop(),
       path: data.path,
       remote_phar_client: '',
       remote_path: '',

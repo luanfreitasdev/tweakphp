@@ -17,8 +17,10 @@
     "build-base": "npm run build && npm run resolve-icon-path",
     "build-mac": "npm run build-base && electron-builder --mac --universal",
     "build-linux": "npm run build-base && electron-builder --linux",
+    "build-win": "npm run build-base && electron-builder --win",
     "publish-mac": "npm run build-base && electron-builder --publish always --mac --universal",
     "publish-linux": "npm run build-base && electron-builder --publish always --linux",
+    "publish-win": "npm run build-base && electron-builder --publish always --win",
     "preview": "vite preview",
     "lint": "prettier --check ./",
     "lint:fix": "prettier --write ./"

@@ -8,6 +8,7 @@
   import { useSettingsStore } from '../stores/settings'
   import { Tab } from '../types/tab.type'
   import { History } from '../types/history.type'
+  import { isWindows } from '../../main/platform.ts'
 
   const tabsStore = useTabsStore()
   const historyStore = useHistoryStore()
@@ -23,10 +24,12 @@
   })
 
   const updateTab = (history: History) => {
+    const pathSplitter = isWindows() ? '\\' : '/'
+
     let tab: Tab = props.tab
     tab.type = 'code'
     tab.path = history.path
-    tab.name = history.path.split('/').pop()
+    tab.name = history.path.split(pathSplitter).pop()
     tabsStore.updateTab(tab)
   }
 

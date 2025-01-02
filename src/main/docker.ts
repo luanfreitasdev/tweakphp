@@ -1,17 +1,13 @@
 import { execSync } from 'child_process'
 import path from 'path'
-import { fileURLToPath } from 'url'
 import { app, ipcMain } from 'electron'
-import { isLinux, isMacOS } from './platform.ts'
+import { isLinux, isMacOS, isWindows } from './platform.ts'
 import { DockerContainerResponse, PHPInfoResponse } from './types/docker.type.ts'
-
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = path.dirname(__filename)
 
 export const DOCKER_PATH = (() => {
   if (isLinux()) return '/usr/bin/docker'
   if (isMacOS()) return '/usr/local/bin/docker'
-  return ''
+  return 'docker'
 })()
 
 export const init = async () => {
@@ -78,13 +74,22 @@ export const getPhpPath = (containerId: string): string | null => {
 }
 
 export const copyPharClient = (phpVersion: string | null, containerId: string): string => {
-  let getClient: string = app.isPackaged
-    ? path.join(process.resourcesPath, `public/client-${phpVersion}.phar`)
-    : path.join(__dirname, `../public/client-${phpVersion}.phar`)
+  let getClient: string
+
+  if (!isWindows()) {
+     getClient = app.isPackaged
+      ? path.join(process.resourcesPath, `public/client-${phpVersion}.phar`)
+      : path.join(__dirname, `../public/client-${phpVersion}.phar`)
+  } else {
+     getClient = path.join(process.cwd(), `public/client-${phpVersion}.phar`);
+  }
 
   try {
     const pharPath = `/tmp/client-${phpVersion}.phar`
-    execSync(`${DOCKER_PATH} cp ${getClient} ${containerId}:'${pharPath}'`).toString().trim()
+
+    const command = `${DOCKER_PATH} cp "${getClient}" ${containerId}:"${pharPath}"`;
+
+    execSync(command).toString().trim()
 
     return pharPath
   } catch (error) {
