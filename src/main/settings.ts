@@ -22,7 +22,7 @@ const settingsPath = app.isPackaged ? path.join(settingsDir, 'settings.json') : 
 const defaultSettings: Settings = {
   version: app.getVersion(),
   laravelPath: laravelPath,
-  php: app.isPackaged ? '' : php.getPHPPath(),
+  php: '',
   theme: 'dracula',
   editorFontSize: 15,
   editorWordWrap: 'on',
